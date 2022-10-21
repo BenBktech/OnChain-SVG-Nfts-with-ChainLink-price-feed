@@ -25,9 +25,29 @@ contract DynamicSvgNft is ERC721, Ownable {
     ) ERC721("Dynamic SVG NFT", "DSN") {
         s_tokenCounter = 0;
         i_priceFeed = AggregatorV3Interface(priceFeedAddress);
+        // setLowSVG(lowSvg);
+        // setHighSVG(highSvg);
         s_lowImageURI = svgToImageURI(lowSvg);
         s_highImageURI = svgToImageURI(highSvg);
     }
+
+    // function setLowURI(string memory svgLowURI) public onlyOwner {
+    //     s_lowImageURI = svgLowURI;
+    // }
+
+    // function setHighURI(string memory svgHighURI) public onlyOwner {
+    //     s_highImageURI = svgHighURI;
+    // }
+
+    // function setLowSVG(string memory svgLowRaw) public onlyOwner {
+    //     string memory svgURI = svgToImageURI(svgLowRaw);
+    //     setLowURI(svgURI);
+    // }
+
+    // function setHighSVG(string memory svgHighRaw) public onlyOwner {
+    //     string memory svgURI = svgToImageURI(svgHighRaw);
+    //     setHighURI(svgURI);
+    // }
 
     function mintNft(int256 highValue) public {
         s_tokenIdToHighValues[s_tokenCounter] = highValue;
@@ -36,13 +56,17 @@ contract DynamicSvgNft is ERC721, Ownable {
         emit CreatedNFT(s_tokenCounter, highValue);
     }
 
-    function svgToImageURI(string memory svg) public pure returns(string memory) {
+    // You could also just upload the raw SVG and have solildity convert it!
+    function svgToImageURI(string memory svg) public pure returns (string memory) {
+        // example:
+        // '<svg width="500" height="500" viewBox="0 0 285 350" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="black" d="M150,0,L75,200,L225,200,Z"></path></svg>' 
+        // would return ""
         string memory baseURL = "data:image/svg+xml;base64,";
         string memory svgBase64Encoded = Base64.encode(bytes(string(abi.encodePacked(svg))));
         return string(abi.encodePacked(baseURL, svgBase64Encoded));
     }
 
-    function _baseURI() internal pure override returns(string memory) {
+    function _baseURI() internal pure override returns (string memory) {
         return "data:application/json;base64,";
     }
 
@@ -63,7 +87,7 @@ contract DynamicSvgNft is ERC721, Ownable {
                         bytes(
                             abi.encodePacked(
                                 '{"name":"',
-                                name(),
+                                name(), // You can add whatever name here
                                 '", "description":"An NFT that changes based on the Chainlink Feed", ',
                                 '"attributes": [{"trait_type": "coolness", "value": 100}], "image":"',
                                 imageURI,
